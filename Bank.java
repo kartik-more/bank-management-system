@@ -114,7 +114,7 @@ class Details extends Info {
 			
 		String url = "jdbc:mysql://127.0.0.1:3306/Bank_Project?user=root";
         String user = "root";
-		String password = "kartik@23";
+		String password = "your_password_here";
 		try(Connection con = DriverManager.getConnection(url, user, password))
 		{
 			System.out.println("\tConnected to database successfully!\n");
@@ -142,11 +142,9 @@ class Details extends Info {
     // 1. Create Account
     case 1: {
         System.out.print("\tFill out the all Details: ");
-        //int count = sc.nextInt();
-
+       
         System.out.println("\n\tMinimum balance is 500 Rs.\n");
 
-        //for (int i = 0; i < count; i++) {
            Details obj = new Details();
 			obj.createAccount(sc);
             while (true) {
@@ -214,7 +212,7 @@ class Details extends Info {
 				}else{
 					System.out.println("\n\tNo account is associated with this phone number.");
 				}
-					//else{System.out.println("\n\tAccount not found!.");}
+					
 				}catch(SQLException es){
 					System.out.println("Error:"+es.getMessage());
 				}	
@@ -281,7 +279,6 @@ class Details extends Info {
 									
 									if(ps.executeUpdate() > 0)
 									{
-										//obj.setAccountPass(p1);
 										System.out.println("\tPIN set successfully.");
 										break;
 									}else{
