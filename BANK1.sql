@@ -25,5 +25,3 @@ CREATE TABLE Transactions(
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
-
-SELECT * FROM Transactions;
