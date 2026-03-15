@@ -63,7 +63,7 @@ This system simulates real-world banking operations, allowing users to manage ac
   
 ---
 
-##Skills Demonstrated
+# Skills Demonstrated #
 
 Technical Skills:
 
@@ -76,7 +76,7 @@ Technical Skills:
 - Git & GitHub version control
 
 ---
-#Soft Skills:
+# Soft Skills #
 
 - Problem-solving
 - Attention to detail
