@@ -7,38 +7,37 @@ This system simulates real-world banking operations, allowing users to manage ac
 
 # Features #
 
-# Account Creation with validation 
-
+Account Creation with validation :
 - Name (alphabet only)
 - Contact number (10-digit Indian mobile number)
 - Address of Customers
 - Account type (Saving / Current)
 - Minimum balance check (500 Rs)
   
-  # Login & Session Management 
+ Login & Session Management:
 - Users stay logged in for seamless operations
 - Account number stored in session for easier access
 - PIN Management:
 - Set, reset, and validate 4-digit PIN
 - Secure PIN entry for all operations
 
-# Deposit & Withdrawal 
+ Deposit & Withdrawal: 
 - Real-time balance updates
 - Transaction history maintained
 - Minimum and maximum balance validations
 
-# Money Transfer 
+ Money Transfer:
 - Transfer funds securely between accounts
 - Verifies account number and contact number of receiver
 - Transaction recorded for both sender and receiver
 
-# Profile Management 
+ Profile Management:
 - Update name, phone number, address, and account type
 
-# Transaction History 
+ Transaction History:
 - Displays all transactions with details: date, time, type, and amount
 
-# Database Integration 
+ Database Integration:
 - Uses MySQL to store account and transaction data
 - JDBC prepared statements ensure security against SQL injection
   
