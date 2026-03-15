@@ -1,15 +1,16 @@
-package kartikjava;
+package Bank_Managment;
 
-import java.util.*;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.sql.*;
- class Info {
+import java.util.Scanner;
+
+class Info {
 
     private String accountNo;
-    private int pin;
+    private String pin;
 
-     public void setAccountNo(String accountNo) {
+    public void setAccountNo(String accountNo) {
         this.accountNo = accountNo;
     }
 
@@ -17,11 +18,11 @@ import java.sql.*;
         return accountNo;
     }
 
-    public void setAccountPass(int pass) {
+    public void setAccountPass(String pass) {
         this.pin = pass;
     }
 
-     public int getAccountPass() {
+    public String getAccountPass() {
         return pin;
     }
 }
@@ -33,758 +34,594 @@ class Details extends Info {
     private String address;
     private String account_type;
     private double current_money;
-	
+
     void createAccount(Scanner sc) {
-
-      
         System.out.println("  --------------------------------");
-        System.out.print("\t| Enter the name: ");                      
-
+        System.out.print("\t| Enter the name: ");
         this.name = sc.nextLine();
-		while(!name.matches("(([A-Z][a-z]+(\\s[A-Z][a-z]+)*)|([a-z]+(\\s[a-z]+)*))")){
-			System.out.println("\tInvalid Name.\n \tTry Again\n");
-			System.out.print("\t| Enter the name: ");
-			this.name = sc.nextLine();
-		}
-		System.out.print("\t| Enter the address: ");
-		this.address = sc.nextLine();
+        while (!name.matches("(([A-Z][a-z]+(\\s[A-Z][a-z]+)*)|([a-z]+(\\s[a-z]+)*))")) {
+            System.out.println("\tInvalid Name.\n \tTry Again\n");
+            System.out.print("\t| Enter the name: ");
+            this.name = sc.nextLine();
+        }
+        System.out.print("\t| Enter the address: ");
+        this.address = sc.nextLine();
         System.out.print("\t| Enter the contact number: ");
         this.contact = sc.next();
-		while(!contact.matches("^[6-9][0-9]{9}$")){
-			System.out.println("\tInvalid Contact Number.\n\tTry Again");
-			System.out.print("\t| Enter the contact number: ");
-			this.contact = sc.next();
-		}
-        System.out.print("\t| Account type (Saving or Current). : ");
+        while (!contact.matches("^[6-9][0-9]{9}$")) {
+            System.out.println("\tInvalid Contact Number.\n\tTry Again");
+            System.out.print("\t| Enter the contact number: ");
+            this.contact = sc.next();
+        }
+        System.out.print("\t| Account type (Saving or Current): ");
         this.account_type = sc.next();
-	   
+        while (!account_type.equalsIgnoreCase("Saving") && !account_type.equalsIgnoreCase("Current")) {
+            System.out.println("\tInvalid Account Type. Choose either 'Saving' or 'Current'.");
+            System.out.print("\t| Account type (Saving or Current): ");
+            account_type = sc.next();
+        }
         account_no();
-       this.current_money=0;
+        this.current_money = 0;
     }
+
     String getPhoneNo() {
         return contact;
     }
-    double getmoney(){
+
+    double getmoney() {
         return current_money;
     }
-    
-    String getName(){
+
+    String getName() {
         return this.name;
     }
-	String getAccType(){
-		return this.account_type;
-	}
-	String getAddress(){
-		return this.address;
-	}
-	
-    void deposit_money(double pass_money){
-        this.current_money+=pass_money;
-    }
-     void withdraw_money(double update){
-        this.current_money-=update;
-    }
-    void account_no() {
 
+    String getAccType() {
+        return this.account_type;
+    }
+
+    String getAddress() {
+        return this.address;
+    }
+
+    void deposit_money(double pass_money) {
+        this.current_money += pass_money;
+    }
+
+    void withdraw_money(double update) {
+        this.current_money -= update;
+    }
+
+    void account_no() {
         int rand = (int) (Math.random() * 1_000_000);
         String pass = "KM2325" + String.format("%06d", rand);
         setAccountNo(pass);
     }
 
     void display() {
-
         System.out.println("\n\tName: " + name);
         System.out.println("\tAddress: " + address);
         System.out.println("\tContact: " + contact);
-        System.out.println("\tAccount NUmber: " + getAccountNo());
+        System.out.println("\tAccount Number: " + getAccountNo());
         System.out.println("\tAccount type: " + account_type.toUpperCase());
-		
     }
-	
 }
 
+public class BankPro {
 
-	public class Bank {
-		
-		static PreparedStatement ps;
-		static ResultSet rs;
-		static LocalDate date;
-		static LocalTime time;
+    static PreparedStatement ps;
+    static ResultSet rs;
+    static LocalDate date;
+    static LocalTime time;
+    static Details obj;
+
     public static void main(String[] args) {
-			
-		String url = "jdbc:mysql://127.0.0.1:3306/Bank_Project?user=root";
+
+        String url = "jdbc:mysql://127.0.0.1:3306/Bank_Project?user=root";
         String user = "root";
-		String password = "your_password_here";
-		try(Connection con = DriverManager.getConnection(url, user, password))
-		{
-			System.out.println("\tConnected to database successfully!\n");
-			
-			System.out.println("\n\t-----Wel Come to Your Bank------\n");
-			Scanner sc = new Scanner(System.in);
+        String password = "kartik@23";
+
+        try (Connection con = DriverManager.getConnection(url, user, password)) {
+
+            System.out.println("\n\tConnected to database successfully!\n");
+            Scanner sc = new Scanner(System.in);
+
+            while (true) {
+                System.out.println(
+                        "\n\t1.Create Account.\t2.Login.\n" +
+                        "\t3.Exit.\n"
+                );
+
+                System.out.print("\tEnter the Choice: ");
+                int ch = sc.nextInt();
+                sc.nextLine();
+
+                switch (ch) {
+                    case 1 -> createAccount(con, sc);
+                    case 2 -> {
+                        String sessionAcc = login(con, sc);
+                        if (sessionAcc != null) sessionDashboard(con, sc, sessionAcc);
+                    }
+                    case 3 -> {
+                        System.out.println("\n\tThanks for visiting...");
+                        System.exit(0);
+                    }
+                    default -> System.out.println("\n\tInvalid Choice.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("\tDatabase Error:" + e.getMessage());
+        }
+    }
+
+    // CREATE ACCOUNT 
+    static void createAccount(Connection con, Scanner sc) {
+        System.out.println("\n\tFill out all Details: ");
+        System.out.println("\n\tMinimum balance is 500 Rs.\n");
+        obj = new Details();
+        obj.createAccount(sc);
 
         while (true) {
+            System.out.print("\t| Enter the starting Amount: ");
+            double pass = sc.nextDouble();
+            System.out.println("  --------------------------------");
 
-            System.out.println(
-                    "\n\t1.Create Acoount.\t2.Your Profile.\n" +
-                    "\t3.Have a Account.\t4.Set the PIN.\n" +
-                    "\t5.Withdraw Money.\t6.Check Balance.\n" +
-                    "\t7.Add Money.\t\t8.Update Profile\n" + 
-					"\t9.Reset PIN.\t\t10.Transcation History.\n"+
-					"\t11.Send Money. \t\t12.For Exit.\n"
-            );
-
-            
-			System.out.print("\tEnter the Choice: ");
-			int	ch1=sc.nextInt();
-			sc.nextLine();
-            switch (ch1) {
-			
-    // 1. Create Account
-    case 1: {
-        System.out.print("\tFill out the all Details: ");
-       
-        System.out.println("\n\tMinimum balance is 500 Rs.\n");
-
-           Details obj = new Details();
-			obj.createAccount(sc);
-            while (true) {
-                System.out.print("\t| Enter the starting Amount: ");
-                double pass = sc.nextDouble();
-				
-				System.out.println("  --------------------------------");
-
-                if (pass < 500) {
-                    System.out.println("\tInsufficient amount. Try again.");
-					
-                } else {
-					
-                    obj.deposit_money(pass);
-					String insert = "INSERT INTO BankInfo(Acct_No, Cust_name, Cust_phone, Cust_Address, Acct_type, Acct_balance, Acct_PIN) VALUES (?, ?, ?, ?, ?, ?,?)";
-					try{
-					
-					ps = con.prepareStatement(insert);
-					ps.setString(1,obj.getAccountNo());
-					ps.setString(2,obj.getName());
-					ps.setString(3,obj.getPhoneNo());
-					ps.setString(4,obj.getAddress());
-					ps.setString(5,obj.getAccType());
-					ps.setDouble(6,obj.getmoney());
-					ps.setNull(7,java.sql.Types.INTEGER);
-					ps.executeUpdate();
-					System.out.println("\tAccount created successfully.\n");
-				
+            if (pass < 500) {
+                System.out.println("\tInsufficient amount. Try again.");
+            } else {
+                obj.deposit_money(pass);
+                String insert = "INSERT INTO BankInfo(Acct_No, Cust_name, Cust_phone, Cust_Address, Acct_type, Acct_balance, Acct_PIN) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                try {
+                    ps = con.prepareStatement(insert);
+                    ps.setString(1, obj.getAccountNo());
+                    ps.setString(2, obj.getName());
+                    ps.setString(3, obj.getPhoneNo());
+                    ps.setString(4, obj.getAddress());
+                    ps.setString(5, obj.getAccType());
+                    ps.setDouble(6, obj.getmoney());
+                    ps.setNull(7, java.sql.Types.VARCHAR);
+                    ps.executeUpdate();
+                   
+                    System.out.println("\n\t-------------------------------");
+                    System.out.println("\t| Account Number:"+ obj.getAccountNo()+ " |");
+                    System.out.println("\t-------------------------------");
+                    System.out.println("\tAccount created successfully.\n");
                     break;
-				}catch(SQLException es){
-					System.out.println("Error: "+es.getMessage());
-					es.printStackTrace();
-				}
-              }
-           }
-	
+                } catch (SQLException es) {
+                    System.out.println("Error: " + es.getMessage());
+                    es.printStackTrace();
+                }
+            }
+        }
     }
-		break;
-    // 2. Show Profile
-    case 2: {
-				System.out.print("\tEnter your Phone Number: ");
-				String phone = sc.next();
-				while(!phone.matches("^[6-9][0-9]{9}$")){
-					System.out.println("\tInvalid Contact Number.\n\tTry Again");
-					System.out.print("\t| Enter the contact number: ");
-					phone = sc.next();
-				}
-				boolean found=false;
-				String phn="SELECT Acct_No, Cust_name, Cust_phone, Cust_Address, Acct_type FROM BankInfo WHERE Cust_phone =?";
-				try{
-				
-				ps=con.prepareStatement(phn);
-				ps.setString(1,phone);
-				rs=ps.executeQuery();
-				if(rs.next()){
-					do{
-						System.out.println(
-							"\tAccount No : " + rs.getString("Acct_No") + " | " +
-							"Name : " + rs.getString("Cust_name") + " | " +
-							"Phone : " + rs.getString("Cust_phone") + " | " +
-							"Address : " + rs.getString("Cust_Address") + " | " +
-							"Account Type : " + rs.getString("Acct_Type") + "\n"
-						);
-					}while(rs.next());
-				}else{
-					System.out.println("\n\tNo account is associated with this phone number.");
-				}
-					
-				}catch(SQLException es){
-					System.out.println("Error:"+es.getMessage());
-				}	
-			break;
-	}
-			// 3. Have an Account
-    case 3: {
-				System.out.print("\tEnter your Account Number: ");
-				String accNo = sc.next();
-				while(!accNo.matches("KM2325[0-9]{6}$")){
-					System.out.println("\tInvalid Account No.\n\t Try Again.");
-					System.out.println("\tEnter your Account Number:");
-					 accNo=sc.next();
-				}
-				System.out.print("\tEnter the PIN: ");
-				int pass = sc.nextInt();
 
-				boolean found = false;
-				String acct="SELECT * FROM BankInfo WHERE Acct_No=? && Acct_PIN = ?";
-				ps=con.prepareStatement(acct);
-				ps.setString(1,accNo);
-				ps.setInt(2,pass);
-				rs=ps.executeQuery();
-				if(rs.next()){
-					System.out.println("\n\tAccount is Exist.");
-					found=true;
-				}
-				
-				if (!found) {
-					System.out.println("\tAccount is not Exist.");
-				}
-				break;
-			}
+    // LOGIN 
+    static String login(Connection con, Scanner sc) throws SQLException {
+        System.out.print("\tEnter Account Number: ");
+        String accNo = sc.next();
+        while (!accNo.matches("KM2325[0-9]{6}$")) {
+            System.out.println("\tInvalid Account No. Try Again.");
+            accNo = sc.next();
+        }
 
-			// 4. Set Password
-    case 4: {
-				System.out.print("\tEnter your Account Number: ");
-				String accNo = sc.next();
-				while(!accNo.matches("KM2325[0-9]{6}$")){
-					System.out.println("\tInvalid Account No.\n\t Try Again.");
-					System.out.println("\tEnter your Account Number:");
-					 accNo=sc.next();
-				}
-				
-				
-				try{
-					String checkpass="SELECT Acct_PIN FROM BankInfo WHERE Acct_PIN IS NOT NULL AND Acct_No=?";
-					ps=con.prepareStatement(checkpass);
-					ps.setString(1,accNo);
-					rs=ps.executeQuery();
-						if(rs.next()){System.out.println("\n\tPIN already set.");}
-						else{
-							rs.close();
-							while(true){
-							System.out.print("\tSet PIN: ");
-							int p1 = sc.nextInt();
-							System.out.print("\tConfirm PIN: ");
-							int p2 = sc.nextInt();
-							if (p1 == p2) {
-								String setpass="UPDATE  BankInfo SET Acct_PIN=? WHERE Acct_No=?";
-								ps=con.prepareStatement(setpass);
-								ps.setInt(1,p2);
-								ps.setString(2,accNo);
-									
-									if(ps.executeUpdate() > 0)
-									{
-										System.out.println("\tPIN set successfully.");
-										break;
-									}else{
-										System.out.println("\n\tAccount not found!.");break;
-										}
-								}else{
-										System.out.println("\n\tPassword not match!. \n\tTry Again.");
-									}
-							}
-						}
-					}catch(SQLException e){System.out.println("ERROR: "+e.getMessage());}
-				break;
-			}
+        System.out.print("\tEnter 4 digit PIN: ");
+        String pin = sc.next();
+        while (!pin.matches("\\d{4}")) {
+            System.out.println("\tPIN must be 4 digits!");
+            pin = sc.next();
+        }
 
-    // 5. Withdraw Money
-    case 5: {
-				System.out.print("\tEnter Account Number: ");
-				String accNo = sc.next();
-				while(!accNo.matches("KM2325[0-9]{6}$")){
-					System.out.println("\tInvalid Account No.\n\t Try Again.");
-					System.out.println("\tEnter your Account Number:");
-					 accNo=sc.next();
-				}
-				System.out.print("\tEnter PIN: ");
-				int pass = sc.nextInt();
-				date=LocalDate.now();
-				time=LocalTime.now();
-				try{
-					con.setAutoCommit(false);
-					String check="SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN = ?";
-					ps=con.prepareStatement(check);
-					ps.setString(1,accNo);
-					ps.setInt(2,pass);
-					rs=ps.executeQuery();
-						if(rs.next()){
-							double current_balance=rs.getDouble("Acct_balance");
-							System.out.print("\n\tEnter the Withdraw Amount:");
-							double amt=sc.nextDouble();
-							if(amt<=current_balance){
-								
-									try{
-									String update_amt="UPDATE BankInfo SET Acct_balance  = Acct_balance - ? WHERE Acct_No=?";
-									ps=con.prepareStatement(update_amt);
-									ps.setDouble(1,amt);
-									ps.setString(2,accNo);
-									int row=ps.executeUpdate();
-									ps.close();
-									String trans="INSERT INTO Transactions (Acct_No,Trans_name,Trans_date,Trans_time,Trans_type,Amount) VALUES (?,?,?,?,?,?)";
-									ps=con.prepareStatement(trans);
-									ps.setString(1,accNo);
-									ps.setString(2,"BOI");
-									ps.setDate(3,java.sql.Date.valueOf(date));
-									ps.setTime(4,java.sql.Time.valueOf(time));
-									ps.setString(5,"Debited");
-									ps.setDouble(6,amt);
-									ps.executeUpdate();
-									ps.close();
-									if(row>0){
-										con.commit();
-										System.out.println("\n\tWithdrawal Successful!");
-										
-										}
-									else{con.rollback();System.out.println("\n\tSomething went Wrong!");}
-									}catch(SQLException es){System.out.println("Error: "+es.getMessage());}
-								}
-								else{System.out.println("\n\tInsufficient Balance.");}
-							}
-							else{System.out.println("\n\tAccount Not Found (check Account No. & PIN).");}
-						
-						
-				}catch (SQLException e) {
-					try {
-						con.rollback(); 
-					} catch (SQLException ex) {
-						System.out.println("Database Error: " + ex.getMessage());
-						
-					}
-					System.out.println("Database Error: " + e.getMessage());
-					
-				} finally {
-					try {
-						con.setAutoCommit(true); 
-					} catch (SQLException ex) {
-						System.out.println("Database Error: " + ex.getMessage());
-						
-					}
-				}
-				break;
-			}
+        String query = "SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
+        ps = con.prepareStatement(query);
+        ps.setString(1, accNo);
+        ps.setString(2, pin);
+        rs = ps.executeQuery();
 
-    // 6. Check Balance
-    case 6: {
-				System.out.print("\tEnter Account Number: ");
-				String accNo = sc.next();
-				while(!accNo.matches("KM2325[0-9]{6}$")){
-					System.out.println("\tInvalid Account No.\n\t Try Again.");
-					System.out.println("\tEnter your Account Number:");
-					 accNo=sc.next();
-				}
-				System.out.print("\tEnter PIN: ");
-				int pass = sc.nextInt();
-				
-					try{
-						String check = "SELECT Acct_balance FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
-						ps=con.prepareStatement(check);
-						ps.setString(1, accNo);
-						ps.setInt(2, pass);
-						
-						rs = ps.executeQuery();
-						if (rs.next()) {
-							double balance = rs.getDouble("Acct_balance");
-							System.out.println("\n\tCurrent Balance: " + balance);
-						} else {
-							System.out.println("\n\tAccount Not Found or Invalid PIN.");
-						}
-						rs.close(); 
-					} catch (SQLException e) {
-						System.out.println("Database Error: " + e.getMessage()+"\n");
-						e.printStackTrace();
-					}
-				break;
-			}
+        if (rs.next()) {
+            System.out.println("\n\tLogin Successful!");
+            return accNo;
+        } else {
+            System.out.println("\n\tInvalid Account or PIN.");
+            return null;
+        }
+    }
 
-    // 7. Add Money
-    case 7: {	
-				System.out.print("\tEnter Account Number: ");
-				String accNo = sc.next();
-				while(!accNo.matches("KM2325[0-9]{6}$")){
-					System.out.println("\tInvalid Account No.\n\t Try Again.");
-					System.out.println("\tEnter your Account Number:");
-					 accNo=sc.next();
-				}
-				System.out.print("\tEnter PIN: ");
-				int pass = sc.nextInt();
-				time=LocalTime.now();
-				date=LocalDate.now();
-				String name=null;
-				
-				try{
-					con.setAutoCommit(false);
-					System.out.print("\n\tEnter Deposit the Amount: ");
-					double amt=sc.nextDouble();
-					String check="UPDATE  BankInfo SET Acct_balance= Acct_balance + ? WHERE Acct_No=? AND Acct_PIN=?";
-					ps=con.prepareStatement(check);
-					ps.setDouble(1,amt);
-					ps.setString(2,accNo);
-					ps.setInt(3,pass);
-					int count=ps.executeUpdate();
-					if(count>0){
-						ps.close();
-						String getname="SELECT Cust_name FROM BankInfo WHERE Acct_No=?";
-						ps=con.prepareStatement(getname);
-						ps.setString(1,accNo);
-						rs=ps.executeQuery();
-						if(rs.next()){
-							 name=rs.getString("Cust_name");
-						}
-						
-						ps.close();
-						String trans="INSERT INTO Transactions (Acct_No,Acct_hold_name,Trans_method,Trans_date,Trans_time,Trans_type,Amount) VALUES (?,?,?,?,?,?,?)";
-						ps=con.prepareStatement(trans);
-						ps.setString(1,accNo);
-						ps.setString(2,name);
-						ps.setString(3,"SELF");
-						ps.setDate(4,java.sql.Date.valueOf(date));
-						ps.setTime(5,java.sql.Time.valueOf(time));
-						ps.setString(6,"Credited");
-						ps.setDouble(7,amt);
-						ps.executeUpdate();
-						ps.close();
-						con.commit();
-						System.out.println("\n\tSuccessfully Deposit.");
-					}else{con.rollback(); System.out.println("Something went Wrong!check acc no or pin");}
-				}catch(SQLException e){
-					try{
-						con.rollback();
-					}catch(SQLException es){
-						System.out.println("Error: "+es.getMessage());
-						es.printStackTrace();
-					}
-					System.out.println("Error: "+e.getMessage());
-					e.printStackTrace();
-				}finally{
-					try{
-						con.setAutoCommit(true);
-					}catch(SQLException ex){
-						System.out.println("Error : "+ ex.getMessage());
-						ex.printStackTrace();
-					}
-				}
-				break;
-		}
-				
-			
-			//8.Update your profile.
-			case 8: {	
-						boolean found=false;
-						System.out.print("\tEnter your Account Number to Update:");
-						String accNo=sc.next();
-						while(!accNo.matches("KM[0-9]{10}$")){
-							System.out.println("\tInvalid Account No.\n\t Try Again.");
-							System.out.println("\tEnter your Account Number:");
-							accNo=sc.next();
-						}
-						try{
-							String check="SELECT * FROM BankInfo WHERE Acct_No=?";
-							ps=con.prepareStatement(check);
-							ps.setString(1,accNo);
-							 rs=ps.executeQuery();
-							if(rs.next()){
-								sc.nextLine();
-								System.out.println("\n\tUpdate the Details.\n" + "\tYou can only update (Name , Phone, Address, Type)\n");
-								 System.out.println("  --------------------------------");
-								System.out.print("\t| Enter the name: ");                      
-								String upname = sc.nextLine();
-								
-								while(!upname.matches("(([A-Z][a-z]+(\\s[A-Z][a-z]+)*)|([a-z]+(\\s[a-z]+)*))")){
-									System.out.println("\tInvalid Name.\n \tTry Again\n");
-									System.out.print("\t| Enter the name: ");
-									upname = sc.nextLine();
-								}
-							
-								System.out.print("\t| Enter the contact number: ");
-								String upcontact = sc.next();
-								while(!upcontact.matches("^[6-9][0-9]{9}$")){
-									System.out.println("\tInvalid Contact Number.\n\tTry Again");
-									System.out.print("\t| Enter the contact number: ");
-									 upcontact = sc.next();
-								}
-								sc.nextLine();
-								System.out.print("\t| Enter the address: ");
-								String upaddress = sc.nextLine();
-								System.out.print("\t| Account type (Saving or Current). : ");
-								String acct_type = sc.next();
-								String insert="UPDATE BankInfo SET Cust_name=? , Cust_phone=?, Cust_address=?, Acct_type=? WHERE Acct_No=?";
-								ps=con.prepareStatement(insert);
-								ps.setString(1,upname);
-								ps.setString(2,upcontact);
-								ps.setString(3,upaddress);
-								ps.setString(4,acct_type);
-								ps.setString(5,accNo);
-								ps.executeUpdate();
-								ps.close();
-							}else{
-								System.out.println("\tAccount not Found!.");
-							}
-						}catch(SQLException es){System.out.println("Error:"+es.getMessage());}
-						
-						break;
-					}
+    // SESSION DASHBOARD
+    static void sessionDashboard(Connection con, Scanner sc, String sessionAcc) throws SQLException {
+        boolean loggedIn = true;
+        while (loggedIn) {
+            System.out.println(
+                    "\n\t------ USER DASHBOARD ------\n" +
+                    "\t1.Check Balance\n" +
+                    "\t2.Add Money\n" +
+                    "\t3.Withdraw Money\n" +
+                    "\t4.Send Money\n" +
+                    "\t5.Transaction History\n" +
+                    "\t6.Update Profile\n" +
+                    "\t7.Reset PIN\n" +
+                    "\t8.Logout\n"
+            );
+            System.out.print("\tEnter Choice: ");
+            int choice = sc.nextInt();
+            sc.nextLine();
 
-				//9.reset password.
-			case 9:  {
-						System.out.println("\n\t--Reset your PIN.--");
-						System.out.print("\tEnter your Account Number: ");
-						String accNo = sc.next();
-						while(!accNo.matches("KM[0-9]{10}$")){
-							System.out.println("\tInvalid Account No.\n\t Try Again.");
-							System.out.println("\tEnter your Account Number:");
-					 		accNo=sc.next();
-						}
-						System.out.print("\tEnter Previous PIN: ");
-						int pass = sc.nextInt();
-						String check="SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
-						try{
-							ps=con.prepareStatement(check);
-							ps.setString(1,accNo);
-							ps.setInt(2,pass);
-							rs=ps.executeQuery();
-							if(rs.next()){
-								System.out.print("\tEnter new PIN:");
-								int new_pass1=sc.nextInt();
-								System.out.print("\tConform new PIN:");
-								int new_pass2=sc.nextInt();
-								if(new_pass1 == new_pass2){
-									String insertPass="UPDATE BankInfo SET Acct_PIN=? WHERE Acct_No=?";
-									ps=con.prepareStatement(insertPass);
-									ps.setInt(1,new_pass1);
-									ps.setString(2,accNo);
-									ps.executeUpdate();
-									ps.close();
-									System.out.println("\n\tReset Password Successfully.");
-								}
-								else{System.out.println("\n\tPassword do not match.");}
-								
-							}else{System.out.println("\n\tIncorrect PIN or Account Number.");}
-						}
-						catch(SQLException es){
-							System.out.println("Error:"+es.getMessage()+ "\n");
-							es.printStackTrace();
-						}
-					break;
-				}
+            switch (choice) {
+                case 1 -> checkBalance(con, sessionAcc);
+                case 2 -> addMoney(con, sessionAcc, sc);
+                case 3 -> withdrawMoney(con, sessionAcc, sc);
+                case 4 -> transferMoney(con, sessionAcc, sc);
+                case 5 -> transactionHistory(con, sessionAcc);
+                case 6 -> updateProfile(con, sessionAcc, sc);
+                case 7 -> resetPIN(con, sessionAcc, sc);
+                case 8 -> {
+                    System.out.println("\n\tLogged Out Successfully.");
+                    loggedIn = false;
+                }
+                default -> System.out.println("\n\tInvalid Choice.");
+            }
+            System.out.println();
+            System.out.print("\tPress (ENTER) to continue...");
+            sc.nextLine();
+        }
+    }
 
+    // OPERATIONS 
+    static void checkBalance(Connection con, String accNo) throws SQLException {
+        String query = "SELECT Acct_balance FROM BankInfo WHERE Acct_No=?";
+        ps = con.prepareStatement(query);
+        ps.setString(1, accNo);
+        rs = ps.executeQuery();
+        if (rs.next()) System.out.println("\n\tCurrent Balance: " + rs.getDouble("Acct_balance"));
+    }
 
-			
-	    case 10: {
-					System.out.print("\n\tEnter Account Number: ");
-					String acc = sc.next();
+    static void addMoney(Connection con, String accNo, Scanner sc) throws SQLException {
+        System.out.print("\tEnter Amount to Deposit: ");
+        double amt = sc.nextDouble();
+        while (amt <= 0) {
+            System.out.print("\tAmount must be > 0. Enter Again: ");
+            amt = sc.nextDouble();
+        }
+        date = LocalDate.now();
+        time = LocalTime.now();
+        con.setAutoCommit(false);
+        try {
+            String update = "UPDATE BankInfo SET Acct_balance= Acct_balance + ? WHERE Acct_No=?";
+            ps = con.prepareStatement(update);
+            ps.setDouble(1, amt);
+            ps.setString(2, accNo);
+            ps.executeUpdate();
+            ps.close();
 
-					while (!acc.matches("KM[0-9]{10}$")) {
-						System.out.println("\tInvalid Account Number. Try Again.");
-						acc = sc.next();
-					}
+            String getname = "SELECT Cust_name FROM BankInfo WHERE Acct_No=?";
+            ps = con.prepareStatement(getname);
+            ps.setString(1, accNo);
+            rs = ps.executeQuery();
+            String name = null;
+            if (rs.next()) name = rs.getString("Cust_name");
+            ps.close();
 
-					String query = "SELECT * FROM Transactions WHERE Acct_No=? ORDER BY Trans_date DESC, Trans_time DESC";
-					ps = con.prepareStatement(query);
-					ps.setString(1, acc);
-					rs = ps.executeQuery();
+            String trans = "INSERT INTO Transactions (Acct_No,Acct_hold_name,Trans_method,Trans_date,Trans_time,Trans_type,Amount) VALUES (?,?,?,?,?,?,?)";
+            ps = con.prepareStatement(trans);
+            ps.setString(1, accNo);
+            ps.setString(2, name);
+            ps.setString(3, "SELF");
+            ps.setDate(4, java.sql.Date.valueOf(date));
+            ps.setTime(5, java.sql.Time.valueOf(time));
+            ps.setString(6, "Credited");
+            ps.setDouble(7, amt);
+            ps.executeUpdate();
+            ps.close();
+            con.commit();
+            System.out.println("\n\tDeposit Successful!");
+        } catch (SQLException e) {
+            con.rollback();
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
+    
+ //  CASE 3: Withdraw Money 
+    static void withdrawMoney(Connection con, String accNo, Scanner sc) throws SQLException {
+        System.out.print("\tEnter 4 digit PIN: ");
+        String pin = sc.next();
+        while (!pin.matches("\\d{4}")) {
+            System.out.print("\tPIN must be 4 digits! Enter Again: ");
+            pin = sc.next();
+        }
 
-					System.out.println("\n\n\t---------------------------------------------------------------------------------------------------------------");
+        date = LocalDate.now();
+        time = LocalTime.now();
+        con.setAutoCommit(false);
+        try {
+            String check = "SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
+            ps = con.prepareStatement(check);
+            ps.setString(1, accNo);
+            ps.setString(2, pin);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                String name = rs.getString("Cust_name");
+                double current_balance = rs.getDouble("Acct_balance");
+                System.out.print("\n\tEnter Withdraw Amount: ");
+                double amt = sc.nextDouble();
+                while (amt <= 0) {
+                    System.out.print("\tAmount must be greater than 0. Enter Again: ");
+                    amt = sc.nextDouble();
+                }
+                if (amt <= current_balance) {
+                    String update_amt = "UPDATE BankInfo SET Acct_balance = Acct_balance - ? WHERE Acct_No=?";
+                    ps = con.prepareStatement(update_amt);
+                    ps.setDouble(1, amt);
+                    ps.setString(2, accNo);
+                    ps.executeUpdate();
+                    ps.close();
 
-						System.out.printf("\t%-6s %-20s %-15s %-12s %-12s %-10s %-12s %-10s\n",
-						"ID", "Name", "Account No", "Method", "Date", "Time", "Type", "Amount");
+                    String trans = "INSERT INTO Transactions (Acct_No,Acct_hold_name,Trans_method,Trans_date,Trans_time,Trans_type,Amount) VALUES (?,?,?,?,?,?,?)";
+                    ps = con.prepareStatement(trans);
+                    ps.setString(1, accNo);
+                    ps.setString(2, name);
+                    ps.setString(3, "SELF");
+                    ps.setDate(4, java.sql.Date.valueOf(date));
+                    ps.setTime(5, java.sql.Time.valueOf(time));
+                    ps.setString(6, "Debited");
+                    ps.setDouble(7, amt);
+                    ps.executeUpdate();
+                    ps.close();
 
-						System.out.println("\t---------------------------------------------------------------------------------------------------------------");
+                    con.commit();
+                    System.out.println("\n\tWithdrawal Successful!");
+                } else {
+                    System.out.println("\n\tInsufficient Balance.");
+                    con.rollback();
+                }
+            } else {
+                System.out.println("\n\tAccount Not Found or Invalid PIN.");
+            }
+        } catch (SQLException e) {
+            con.rollback();
+            System.out.println("Database Error: " + e.getMessage());
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
 
-						boolean found = false;
+    //CASE 4: Transfer Money 
+    static void transferMoney(Connection con, String senderAcc, Scanner sc) throws SQLException {
+        date = LocalDate.now();
+        time = LocalTime.now();
 
-						while (rs.next()) {
+        System.out.print("\tEnter Receiver Account No: ");
+        String receiverAcc = sc.next();
+        while (!receiverAcc.matches("KM2325[0-9]{6}$")) {
+            System.out.print("\tInvalid Account No. Enter Again: ");
+            receiverAcc = sc.next();
+        }
 
-							found = true;
+        System.out.print("\tEnter Receiver Phone No: ");
+        String receiverPhone = sc.next();
+        while (!receiverPhone.matches("^[6-9][0-9]{9}$")) {
+            System.out.print("\tInvalid Phone. Enter Again: ");
+            receiverPhone = sc.next();
+        }
 
-							int id = rs.getInt("Trans_ID");
-							String name = rs.getString("Acct_hold_name");
-							String accNo = rs.getString("Acct_No");
-							String method = rs.getString("Trans_method");
-							java.sql.Date date = rs.getDate("Trans_date");
-							Time time = rs.getTime("Trans_time");
-							String type = rs.getString("Trans_type");
-							double amount = rs.getDouble("Amount");
+        if (senderAcc.equals(receiverAcc)) {
+            System.out.println("\n\tCannot transfer to same account.");
+            return;
+        }
 
-							System.out.printf("\t%-6d %-20s %-15s %-12s %-12s %-10s %-12s %-10.2f\n",
-									id, name, accNo, method, date, time, type, amount);
-						}
+        System.out.print("\tEnter 4 digit PIN: ");
+        String senderPin = sc.next();
+        while (!senderPin.matches("\\d{4}")) {
+            System.out.print("\tPIN must be 4 digits! Enter Again: ");
+            senderPin = sc.next();
+        }
 
-						System.out.println("\t---------------------------------------------------------------------------------------------------------------");
+        try {
+            con.setAutoCommit(false);
 
+            // Verify receiver
+            String receiverQuery = "SELECT * FROM BankInfo WHERE Acct_No=? AND Cust_phone=?";
+            ps = con.prepareStatement(receiverQuery);
+            ps.setString(1, receiverAcc);
+            ps.setString(2, receiverPhone);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                System.out.println("\n\tReceiver not found.");
+                con.rollback();
+                return;
+            }
+            String receiverName = rs.getString("Cust_name");
+            ps.close();
 
-					if (!found) {
-						System.out.println("\n\tNo Transactions Found.");
-					}
-					
-				break;
-				}
+            // Verify sender
+            String senderQuery = "SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
+            ps = con.prepareStatement(senderQuery);
+            ps.setString(1, senderAcc);
+            ps.setString(2, senderPin);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                System.out.println("\n\tIncorrect Account No or PIN.");
+                con.rollback();
+                return;
+            }
+            double senderBalance = rs.getDouble("Acct_balance");
+            String senderName = rs.getString("Cust_name");
+            ps.close();
 
-		case 11: {
+            System.out.print("\tEnter Amount to Transfer: ");
+            double amount = sc.nextDouble();
+            while (amount <= 0) {
+                System.out.print("\tAmount must be > 0. Enter Again: ");
+                amount = sc.nextDouble();
+            }
 
-					try {
+            if (senderBalance < amount) {
+                System.out.println("\n\tInsufficient Balance.");
+                con.rollback();
+                return;
+            }
 
-						date = LocalDate.now();
-						time = LocalTime.now();
+            // Update balances
+            String credit = "UPDATE BankInfo SET Acct_balance = Acct_balance + ? WHERE Acct_No=?";
+            ps = con.prepareStatement(credit);
+            ps.setDouble(1, amount);
+            ps.setString(2, receiverAcc);
+            ps.executeUpdate();
+            ps.close();
 
-						System.out.print("\n\tEnter Receiver Account No: ");
-						String receiverAcc = sc.next();
+            String debit = "UPDATE BankInfo SET Acct_balance = Acct_balance - ? WHERE Acct_No=?";
+            ps = con.prepareStatement(debit);
+            ps.setDouble(1, amount);
+            ps.setString(2, senderAcc);
+            ps.executeUpdate();
+            ps.close();
 
-						while (!receiverAcc.matches("KM[0-9]{10}$")) {
-							System.out.println("\tInvalid Account No. Try Again.");
-							receiverAcc = sc.next();
-						}
+            // Transaction records
+            String senderTrans = "INSERT INTO Transactions (Acct_hold_name, Acct_No, Trans_method, Trans_date, Trans_time, Trans_type, Amount) VALUES (?,?,?,?,?,?,?)";
+            ps = con.prepareStatement(senderTrans);
+            ps.setString(1, receiverName);
+            ps.setString(2, senderAcc);
+            ps.setString(3, "Transfer");
+            ps.setDate(4, java.sql.Date.valueOf(date));
+            ps.setTime(5, java.sql.Time.valueOf(time));
+            ps.setString(6, "Debited");
+            ps.setDouble(7, amount);
+            ps.executeUpdate();
+            ps.close();
 
-						System.out.print("\tEnter Receiver Phone No: ");
-						String receiverPhone = sc.next();
+            String receiverTrans = "INSERT INTO Transactions (Acct_hold_name, Acct_No, Trans_method, Trans_date, Trans_time, Trans_type, Amount) VALUES (?,?,?,?,?,?,?)";
+            ps = con.prepareStatement(receiverTrans);
+            ps.setString(1, senderName);
+            ps.setString(2, receiverAcc);
+            ps.setString(3, "Transfer");
+            ps.setDate(4, java.sql.Date.valueOf(date));
+            ps.setTime(5, java.sql.Time.valueOf(time));
+            ps.setString(6, "Credited");
+            ps.setDouble(7, amount);
+            ps.executeUpdate();
+            ps.close();
 
-						while (!receiverPhone.matches("^[6-9][0-9]{9}$")) {
-							System.out.println("\tInvalid Contact Number. Try Again.");
-							receiverPhone = sc.next();
-						}
+            con.commit();
+            System.out.println("\n\tTransfer Successful.");
+        } catch (SQLException e) {
+            con.rollback();
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            con.setAutoCommit(true);
+        }
+    }
 
-						con.setAutoCommit(false);
+    //CASE 5: Transaction History 
+    static void transactionHistory(Connection con, String accNo) throws SQLException {
+        String query = "SELECT * FROM Transactions WHERE Acct_No=? ORDER BY Trans_date DESC, Trans_time DESC";
+        ps = con.prepareStatement(query);
+        ps.setString(1, accNo);
+        rs = ps.executeQuery();
 
-						
-						String receiverQuery = "SELECT * FROM BankInfo WHERE Acct_No=? AND Cust_phone=?";
-						ps = con.prepareStatement(receiverQuery);
-						ps.setString(1, receiverAcc);
-						ps.setString(2, receiverPhone);
-						rs = ps.executeQuery();
+        System.out.println("\n\t---------------------------------------------------------------------------------------------------------------");
+        System.out.printf("\t%-6s %-20s %-15s %-12s %-12s %-10s %-12s %-10s\n", "ID", "Name", "Account No", "Method", "Date", "Time", "Type", "Amount");
+        System.out.println("\t---------------------------------------------------------------------------------------------------------------");
 
-						if (!rs.next()) {
-							System.out.println("\n\tReceiver account not found.");
-							con.rollback();
-							break;
-						}
+        boolean found = false;
+        while (rs.next()) {
+            found = true;
+            int id = rs.getInt("Trans_ID");
+            String name = rs.getString("Acct_hold_name");
+            String account = rs.getString("Acct_No");
+            String method = rs.getString("Trans_method");
+            java.sql.Date date = rs.getDate("Trans_date");
+            Time time = rs.getTime("Trans_time");
+            String type = rs.getString("Trans_type");
+            double amount = rs.getDouble("Amount");
+            System.out.printf("\t%-6d %-20s %-15s %-12s %-12s %-10s %-12s %-10.2f\n", id, name, account, method, date, time, type, amount);
+        }
+        System.out.println("\t---------------------------------------------------------------------------------------------------------------");
+        if (!found) System.out.println("\n\tNo Transactions Found.");
+    }
 
-						String receiverName = rs.getString("Cust_name");
-						ps.close();
+    // CASE 6: Update Profile
+    static void updateProfile(Connection con, String accNo, Scanner sc) throws SQLException {
+        String check = "SELECT * FROM BankInfo WHERE Acct_No=?";
+        ps = con.prepareStatement(check);
+        ps.setString(1, accNo);
+        rs = ps.executeQuery();
+        if (rs.next()) {
+            sc.nextLine();
+            System.out.println("\n\tUpdate Details (Name, Phone, Address, Type)\n");
+            System.out.print("\t| Enter new name: ");
+            String upname = sc.nextLine();
+            while (!upname.matches("(([A-Z][a-z]+(\\s[A-Z][a-z]+)*)|([a-z]+(\\s[a-z]+)*))")) {
+                System.out.print("\tInvalid Name. Enter Again: ");
+                upname = sc.nextLine();
+            }
+            System.out.print("\t| Enter new contact: ");
+            String upcontact = sc.next();
+            while (!upcontact.matches("^[6-9][0-9]{9}$")) {
+                System.out.print("\tInvalid Phone. Enter Again: ");
+                upcontact = sc.next();
+            }
+            sc.nextLine();
+            System.out.print("\t| Enter new address: ");
+            String upaddress = sc.nextLine();
+            System.out.print("\t| Account type (Saving or Current): ");
+            String acct_type = sc.next();
+            String insert = "UPDATE BankInfo SET Cust_name=?, Cust_phone=?, Cust_address=?, Acct_type=? WHERE Acct_No=?";
+            ps = con.prepareStatement(insert);
+            ps.setString(1, upname);
+            ps.setString(2, upcontact);
+            ps.setString(3, upaddress);
+            ps.setString(4, acct_type);
+            ps.setString(5, accNo);
+            ps.executeUpdate();
+            ps.close();
+            System.out.println("\tProfile Updated Successfully!");
+        } else {
+            System.out.println("\tAccount not Found!.");
+        }
+    }
 
-						System.out.print("\n\tEnter Your Account No: ");
-						String senderAcc = sc.next();
+   //CASE 7: Reset PIN
+    static void resetPIN(Connection con, String accNo, Scanner sc) throws SQLException {
+        System.out.print("\tEnter Previous PIN: ");
+        String pin = sc.next();
+        while (!pin.matches("\\d{4}")) {
+            System.out.print("\tPIN must be 4 digits! Enter Again: ");
+            pin = sc.next();
+        }
 
-						while (!senderAcc.matches("KM[0-9]{10}$")) {
-							System.out.println("\tInvalid Account No. Try Again.");
-							senderAcc = sc.next();
-						}
+        String check = "SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
+        ps = con.prepareStatement(check);
+        ps.setString(1, accNo);
+        ps.setString(2, pin);
+        rs = ps.executeQuery();
 
-						if (senderAcc.equals(receiverAcc)) {
-							System.out.println("\n\tCannot transfer to same account.");
-							con.rollback();
-							break;
-						}
-
-						System.out.print("\tEnter Your PIN: ");
-						int senderPin = sc.nextInt();
-
-						String senderQuery = "SELECT * FROM BankInfo WHERE Acct_No=? AND Acct_PIN=?";
-						ps = con.prepareStatement(senderQuery);
-						ps.setString(1, senderAcc);
-						ps.setInt(2, senderPin);
-						rs = ps.executeQuery();
-
-						if (!rs.next()) {
-							System.out.println("\n\tIncorrect Account No or PIN.");
-							con.rollback();
-							break;
-						}
-
-						double senderBalance = rs.getDouble("Acct_balance");
-						String senderName = rs.getString("Cust_name");
-						ps.close();
-
-						
-						System.out.print("\tEnter Amount to Transfer: ");
-						double amount = sc.nextDouble();
-
-						if (senderBalance < amount) {
-							System.out.println("\n\tInsufficient Balance.");
-							con.rollback();
-							break;
-						}
-
-						String credit = "UPDATE BankInfo SET Acct_balance = Acct_balance + ? WHERE Acct_No=?";
-						ps = con.prepareStatement(credit);
-						ps.setDouble(1, amount);
-						ps.setString(2, receiverAcc);
-						ps.executeUpdate();
-						ps.close();
-
-						String debit = "UPDATE BankInfo SET Acct_balance = Acct_balance - ? WHERE Acct_No=?";
-						ps = con.prepareStatement(debit);
-						ps.setDouble(1, amount);
-						ps.setString(2, senderAcc);
-						ps.executeUpdate();
-						ps.close();
-
-						String senderTrans = "INSERT INTO Transactions (Acct_hold_name, Acct_No, Trans_method, Trans_date, Trans_time, Trans_type, Amount) VALUES (?,?,?,?,?,?,?)";
-						ps = con.prepareStatement(senderTrans);
-						ps.setString(1, receiverName);
-						ps.setString(2, senderAcc);
-						ps.setString(3, "Transfer");
-						ps.setDate(4, java.sql.Date.valueOf(date));
-						ps.setTime(5, java.sql.Time.valueOf(time));
-						ps.setString(6, "Debited");
-						ps.setDouble(7, amount);
-						ps.executeUpdate();
-						ps.close();
-
-						String receiverTrans = "INSERT INTO Transactions (Acct_hold_name, Acct_No, Trans_method, Trans_date, Trans_time, Trans_type, Amount) VALUES (?,?,?,?,?,?,?)";
-						ps = con.prepareStatement(receiverTrans);
-						ps.setString(1, senderName);
-						ps.setString(2, receiverAcc);
-						ps.setString(3, "Transfer");
-						ps.setDate(4, java.sql.Date.valueOf(date));
-						ps.setTime(5, java.sql.Time.valueOf(time));
-						ps.setString(6, "Credited");
-						ps.setDouble(7, amount);
-						ps.executeUpdate();
-						ps.close();
-
-						con.commit();
-
-						System.out.println("\n\tTransfer Successful.");
-
-					} catch (SQLException e) {
-
-						try {
-							con.rollback();
-						} catch (SQLException ex) {
-							ex.printStackTrace();
-						}
-
-						System.out.println("\nError: " + e.getMessage());
-					}
-
-					break;
-				}
-				    // 12. Exit
-		case 12: {
-					System.out.println("\n\tThanks for visiting...");
-					System.exit(0);
-					break;
-				}
-
-		default:
-			System.out.println("\n\tInvalid Choice.");
-		}
-			System.out.println();
-           System.out.print("\tPress (ENTER) to contiue..");
-			sc.nextLine();
-			sc.nextLine();
-		
-			}
-		}
-		catch(SQLException e){
-			 System.out.println("\tDatabase Error:"+e.getMessage());
-		}
-		}
-		
-	}
-
+        if (rs.next()) {
+            String newPIN1, newPIN2;
+            while (true) {
+                System.out.print("\tEnter new PIN: ");
+                newPIN1 = sc.next();
+                if (!newPIN1.matches("\\d{4}")) {
+                    System.out.println("\tPIN must be 4 digits! Try Again.");
+                    continue;
+                }
+                System.out.print("\tConfirm new PIN: ");
+                newPIN2 = sc.next();
+                if (newPIN1.equals(newPIN2)) {
+                    String update = "UPDATE BankInfo SET Acct_PIN=? WHERE Acct_No=?";
+                    ps = con.prepareStatement(update);
+                    ps.setString(1, newPIN1);
+                    ps.setString(2, accNo);
+                    ps.executeUpdate();
+                    ps.close();
+                    System.out.println("\n\tPIN Reset Successfully!");
+                    break;
+                } else {
+                    System.out.println("\tPIN does not match! Try Again.");
+                }
+            }
+        } else {
+            System.out.println("\n\tIncorrect Previous PIN.");
+        }
+    }
+}
