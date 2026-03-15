@@ -5,28 +5,43 @@ This system simulates real-world banking operations, allowing users to manage ac
 
 ---
 
-## 🏦 Features
+## Features
 
-- **Account Management**
-  - Create a new bank account with a unique account number.
-  - Set and reset account PIN for security.
-  - Update personal information: Name, Address, Contact Number, Email, and Account Type.
+# Account Creation with validation #
 
-- **Banking Operations**
-  - Deposit and withdraw money with automatic balance update.
-  - Check account balance at any time.
-  - Send money securely to other accounts.
+- Name (alphabet only)
+- Contact number (10-digit Indian mobile number)
+- Address of Customers
+- Account type (Saving / Current)
+- Minimum balance check (500 Rs)
+  
+  # Login & Session Management #
+- Users stay logged in for seamless operations
+- Account number stored in session for easier access
+- PIN Management:
+- Set, reset, and validate 4-digit PIN
+- Secure PIN entry for all operations
 
-- **Transaction History**
-  - Maintain a detailed record of all transactions.
-  - View transactions sorted by date and time.
-  - Includes type of transaction (Credited/Debited/Transfer) and method.
+# Deposit & Withdrawal #
+- Real-time balance updates
+- Transaction history maintained
+- Minimum and maximum balance validations
 
-- **Validation & Security**
-  - Validates phone number, account number, email format, and PIN inputs.
-  - Enforces minimum balance rules (Rs. 500).
-  - Transaction rollback in case of errors (using JDBC transaction management).
+# Money Transfer #
+- Transfer funds securely between accounts
+- Verifies account number and contact number of receiver
+- Transaction recorded for both sender and receiver
 
+# Profile Management #
+- Update name, phone number, address, and account type
+
+# Transaction History #
+- Displays all transactions with details: date, time, type, and amount
+
+# Database Integration #
+- Uses MySQL to store account and transaction data
+- JDBC prepared statements ensure security against SQL injection
+  
 ---
 
 ## 🛠 Technologies Used
@@ -37,6 +52,15 @@ This system simulates real-world banking operations, allowing users to manage ac
 - **Git & GitHub** – Version control and project hosting.
 - **IDE** – Eclipse, IntelliJ IDEA, or NetBeans (optional).
 
+---
+
+# Validations Implemented #
+- Name: Alphabets only, supports multiple words
+- Contact: 10-digit Indian mobile number starting with 6–9
+- Account Type: Must be Saving or Current
+- PIN: Must be 4 digits
+- Amounts: Cannot be negative or zero; withdrawal limited by balance
+  
 ---
 
 ##Skills Demonstrated
@@ -61,3 +85,12 @@ Technical Skills:
 - Professional documentation
 
 ---
+
+# Future Improvements #
+
+- OTP Integration: Add SMS/email OTP for critical operations like money transfer.
+- GUI Interface: Convert console-based app to a graphical interface.
+- Encryption: Encrypt PIN and sensitive user data in the database.
+- Multi-user Support: Handle multiple sessions simultaneously.
+
+  ---
