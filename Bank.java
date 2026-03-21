@@ -60,6 +60,7 @@ class Details extends Info {
             System.out.print("\t| Account type (Saving or Current): ");
             account_type = sc.next();
         }
+       
         account_no();
         this.current_money = 0;
     }
@@ -171,8 +172,25 @@ public class BankPro {
                 System.out.println("\tInsufficient amount. Try again.");
             } else {
                 obj.deposit_money(pass);
+                String pin;
+                while(true) {
+	        	        System.out.print("\n\n\tCreate the PIN: ");
+	        	        pin = sc.next();
+		        	        while (!pin.matches("\\d{4}")) {
+		        	            System.out.print("\tPIN must be 4 digits! Enter Again: ");
+		        	            pin = sc.next();
+		        	        }
+	        	        System.out.print("\n\n\tConform the PIN: ");
+	        	        String pin2=sc.next();
+	        	        if(pin.equalsIgnoreCase(pin2)) {
+	        	        	  obj.setAccountPass(pin);
+	        	        	  break;
+	        	        }
+	        	        else {System.out.println("\n\tPIN do not match.\n\tTry Again.");}
+                }
                 String insert = "INSERT INTO BankInfo(Acct_No, Cust_name, Cust_phone, Cust_Address, Acct_type, Acct_balance, Acct_PIN) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 try {
+                	
                     ps = con.prepareStatement(insert);
                     ps.setString(1, obj.getAccountNo());
                     ps.setString(2, obj.getName());
@@ -180,7 +198,7 @@ public class BankPro {
                     ps.setString(4, obj.getAddress());
                     ps.setString(5, obj.getAccType());
                     ps.setDouble(6, obj.getmoney());
-                    ps.setNull(7, java.sql.Types.VARCHAR);
+                    ps.setString(7, pin);
                     ps.executeUpdate();
                    
                     System.out.println("\n\t-------------------------------");
@@ -244,8 +262,8 @@ public class BankPro {
             );
             System.out.print("\tEnter Choice: ");
             int choice = sc.nextInt();
-            sc.nextLine();
-
+            //sc.nextLine();
+            
             switch (choice) {
                 case 1 -> checkBalance(con, sessionAcc);
                 case 2 -> addMoney(con, sessionAcc, sc);
@@ -261,6 +279,7 @@ public class BankPro {
                 default -> System.out.println("\n\tInvalid Choice.");
             }
             System.out.println();
+            sc.nextLine();
             System.out.print("\tPress (ENTER) to continue...");
             sc.nextLine();
         }
@@ -274,14 +293,15 @@ public class BankPro {
         rs = ps.executeQuery();
         if (rs.next()) System.out.println("\n\tCurrent Balance: " + rs.getDouble("Acct_balance"));
     }
-
+    // DEPOSIT MONEY
     static void addMoney(Connection con, String accNo, Scanner sc) throws SQLException {
         System.out.print("\tEnter Amount to Deposit: ");
         double amt = sc.nextDouble();
         while (amt <= 0) {
-            System.out.print("\tAmount must be > 0. Enter Again: ");
+            System.out.print("\tAmount must be Greater than 0.\n\t Enter Again: ");
             amt = sc.nextDouble();
         }
+        sc.nextLine();
         date = LocalDate.now();
         time = LocalTime.now();
         con.setAutoCommit(false);
@@ -349,6 +369,7 @@ public class BankPro {
                     System.out.print("\tAmount must be greater than 0. Enter Again: ");
                     amt = sc.nextDouble();
                 }
+                sc.nextLine();
                 if (amt <= current_balance) {
                     String update_amt = "UPDATE BankInfo SET Acct_balance = Acct_balance - ? WHERE Acct_No=?";
                     ps = con.prepareStatement(update_amt);
@@ -410,13 +431,13 @@ public class BankPro {
             return;
         }
 
-        System.out.print("\tEnter 4 digit PIN: ");
+        System.out.print("\tEnter Your PIN: ");
         String senderPin = sc.next();
         while (!senderPin.matches("\\d{4}")) {
             System.out.print("\tPIN must be 4 digits! Enter Again: ");
             senderPin = sc.next();
         }
-
+        sc.nextLine();
         try {
             con.setAutoCommit(false);
 
@@ -546,6 +567,7 @@ public class BankPro {
         ps = con.prepareStatement(check);
         ps.setString(1, accNo);
         rs = ps.executeQuery();
+       
         if (rs.next()) {
             sc.nextLine();
             System.out.println("\n\tUpdate Details (Name, Phone, Address, Type)\n");
@@ -576,6 +598,7 @@ public class BankPro {
             ps.executeUpdate();
             ps.close();
             System.out.println("\tProfile Updated Successfully!");
+            sc.nextLine();
         } else {
             System.out.println("\tAccount not Found!.");
         }
@@ -615,6 +638,7 @@ public class BankPro {
                     ps.executeUpdate();
                     ps.close();
                     System.out.println("\n\tPIN Reset Successfully!");
+                   
                     break;
                 } else {
                     System.out.println("\tPIN does not match! Try Again.");
@@ -623,5 +647,6 @@ public class BankPro {
         } else {
             System.out.println("\n\tIncorrect Previous PIN.");
         }
+        sc.nextLine();
     }
 }
