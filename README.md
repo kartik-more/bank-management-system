@@ -59,5 +59,5 @@ This system simulates real-world banking operations 💼, allowing users to mana
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/your-username/bank-management-system.git
-cd bank-management-system
+[git clone https://github.com/your-username/bank-management-system.git
+cd bank-management-system](https://github.com/kartik-more/bank-management-system.git)
