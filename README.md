@@ -1,95 +1,63 @@
-# Bank Management System
+# 🏦 Bank Management System
 
-A **Java-based Bank Management System** application built using **Java**, **JDBC**, and **MySQL**.  
-This system simulates real-world banking operations, allowing users to manage accounts, deposit/withdraw money, transfer funds, and track transactions securely.
+A **Java-based Bank Management System** application built using **Java ☕**, **JDBC 🔗**, and **MySQL 🗄️**.
+
+This system simulates real-world banking operations 💼, allowing users to manage accounts, deposit/withdraw money 💰, transfer funds 🔄, and track transactions securely 🔐.
 
 ---
 
-# Features #
+## ✨ Features
 
-Account Creation with validation :
-- Name (alphabet only)
-- Contact number (10-digit Indian mobile number)
-- Address of Customers
-- Account type (Saving / Current)
-- Minimum balance check (500 Rs)
-  
- Login & Session Management:
-- Users stay logged in for seamless operations
-- Account number stored in session for easier access
-- PIN Management:
-- Set, reset, and validate 4-digit PIN
-- Secure PIN entry for all operations
+### 🧾 Account Creation with Validation
+- 👤 Name (alphabet only)
+- 📱 Contact number (10-digit Indian mobile number)
+- 🏠 Address of customers
+- 🏦 Account type (Saving / Current)
+- 💵 Minimum balance check (₹500)
 
- Deposit & Withdrawal: 
-- Real-time balance updates
-- Transaction history maintained
-- Minimum and maximum balance validations
+### 🔐 Login & Session Management
+- 🔄 Users stay logged in for seamless operations
+- 🆔 Account number stored in session for easier access
 
- Money Transfer:
-- Transfer funds securely between accounts
-- Verifies account number and contact number of receiver
-- Transaction recorded for both sender and receiver
+### 🔑 PIN Management
+- 🔢 Set, reset, and validate 4-digit PIN
+- 🛡️ Secure PIN required for all operations
 
- Profile Management:
-- Update name, phone number, address, and account type
+### 💸 Deposit & Withdrawal
+- ⚡ Real-time balance updates
+- 📜 Transaction history maintained
+- ⚖️ Balance validations applied
 
- Transaction History:
-- Displays all transactions with details: date, time, type, and amount
+### 🔄 Money Transfer
+- 💳 Secure transfer between accounts
+- ✅ Verifies receiver details
+- 📝 Transactions recorded for both users
 
- Database Integration:
-- Uses MySQL to store account and transaction data
-- JDBC prepared statements ensure security against SQL injection
-  
+### 👤 Profile Management
+- ✏️ Update name, phone number, address, and account type
+
+### 📊 Transaction History
+- 📅 View all transactions with date, time, type, and amount
+
+### 🗄️ Database Integration
+- 🧩 MySQL used for storing data
+- 🔒 JDBC Prepared Statements prevent SQL injection
+
 ---
 
 ## 🛠 Technologies Used
 
-- **Java** – Core programming language.
-- **JDBC** – Database connectivity.
-- **MySQL** – Relational database for accounts and transactions.
-- **Git & GitHub** – Version control and project hosting.
-- **IDE** – Eclipse, IntelliJ IDEA, or NetBeans (optional).
+- ☕ **Java** – Core programming language  
+- 🔗 **JDBC** – Database connectivity  
+- 🗄️ **MySQL** – Relational database  
+- 🧑‍💻 **Git & GitHub** – Version control  
+- 💻 **IDE** – IntelliJ / Eclipse / NetBeans  
 
 ---
 
-# Validations Implemented 
-- Name: Alphabets only, supports multiple words
-- Contact: 10-digit Indian mobile number starting with 6–9
-- Account Type: Must be Saving or Current
-- PIN: Must be 4 digits
-- Amounts: Cannot be negative or zero; withdrawal limited by balance
-  
----
+## ⚙️ Installation & Setup
 
-# Skills Demonstrated 
-
-Technical Skills:
-
-- Java OOP (classes, inheritance, methods)
-- JDBC & MySQL CRUD operations
-- SQL queries and transactions
-- Input validation with Regex (phone, email, account number)
-- Exception handling
-- Console-based UI design
-- Git & GitHub version control
-
----
-# Soft Skills 
-
-- Problem-solving
-- Attention to detail
-- Project organization & management
-- Database design thinking
-- Professional documentation
-
----
-
-# Future Improvements 
-
-- OTP Integration: Add SMS/email OTP for critical operations like money transfer.
-- GUI Interface: Convert console-based app to a graphical interface.
-- Encryption: Encrypt PIN and sensitive user data in the database.
-- Multi-user Support: Handle multiple sessions simultaneously.
-
-  ---
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/bank-management-system.git
+cd bank-management-system
