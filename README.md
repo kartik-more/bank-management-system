@@ -54,10 +54,19 @@ This system simulates real-world banking operations 💼, allowing users to mana
 - 💻 **IDE** – IntelliJ / Eclipse / NetBeans  
 
 ---
+## 🚀 Future Enhancements
 
+- ⚡ Convert project into Spring Boot application  
+- 🧵 Add multithreading for better performance  
+- 🔐 Improve security with login authentication system  
+- 🗄️ Optimize database handling and queries  
+- 📡 Create REST APIs for better integration  
+- 📈 Add logging for tracking system activities  
+- 💳 Add extra features like loan and interest calculation
+
+---
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the Repository
 ```bash
 [git clone https://github.com/your-username/bank-management-system.git
-cd bank-management-system](https://github.com/kartik-more/bank-management-system.git)
